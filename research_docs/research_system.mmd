@@ -1,0 +1,68 @@
+flowchart LR
+    subgraph P[Operational EduPulse Platform - IMPLEMENTED]
+        R[Interactive Reader]
+        T[Telemetry and micro-interactions]
+        N[Notes, annotations, Ask AI, feedback]
+        H[Heuristic confusion score and heatmap]
+        D[(Operational PostgreSQL)]
+        R --> T
+        R --> N
+        T --> H
+        N --> H
+        T --> D
+        N --> D
+        H --> D
+    end
+
+    subgraph G[Research Governance Gate - PROPOSED]
+        C[Consent and participant notice]
+        E[Ethics or institutional approval]
+        V[Schema version and provenance validation]
+        X[De-identification and retention policy]
+        C --> E --> V --> X
+    end
+
+    subgraph L[Ground-Truth Layers - PROPOSED]
+        S[Momentary self-report]
+        TL[Teacher region or page label]
+        Q[Quiz item outcome]
+        EX[Exam or delayed outcome]
+    end
+
+    subgraph M[Paper 1 Modeling Pipeline - PROPOSED]
+        F[Event, text, spatial, temporal, and content features]
+        SP[Student-page sequence encoder]
+        CA[Cohort and spatial aggregator]
+        MT[Multi-task prediction heads]
+        CAL[Post-hoc calibration and uncertainty]
+        O[Evidence-aware cohort output]
+        F --> SP --> CA --> MT --> CAL --> O
+    end
+
+    subgraph EV[Evaluation - PROPOSED]
+        B[Heuristic and ML baselines]
+        A[Ablations]
+        CV[Grouped temporal and course splits]
+        MET[Discrimination, calibration, localization, lead time]
+        ST[Cluster-aware statistics and subgroup audit]
+        B --> MET
+        A --> MET
+        CV --> MET --> ST
+    end
+
+    D -. only approved records .-> G
+    X --> F
+    S --> MT
+    TL --> MT
+    Q --> MT
+    EX --> MT
+    O --> EV
+
+    subgraph PI[Pedagogical Intervention Program - FUTURE]
+        IA[Instructor action]
+        OUT[Subsequent learning outcome]
+        CS[Causal or stepped-wedge study]
+        IA --> OUT --> CS
+    end
+
+    O -. future decision support .-> IA

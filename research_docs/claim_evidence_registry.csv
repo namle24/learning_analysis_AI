@@ -1,0 +1,13 @@
+claim_id,claim,status,current_evidence,required_next_evidence,paper_scope
+C01,"EduPulse captures page-level dwell scroll reversal hover selection and geometry",IMPLEMENTED,"Frontend telemetry hook backend schema and interaction_telemetry_logs","Production data-quality report under approved protocol",Paper1
+C02,"EduPulse stores and maps text notes highlights drawings lasso and Ask AI signals",IMPLEMENTED,"Notes annotations visual crops AI question and classified learning-event models","Event provenance audit and approved replay dataset",Paper1
+C03,"The current score combines implicit and explicit signals with idle decay",IMPLEMENTED,"confusion_scoring.py and confusion_weights.py","Frozen baseline implementation and unit tests",Paper1
+C04,"The current heatmap applies action weights exponential age decay unique actors and log damping",IMPLEMENTED,"coordinate_heatmap.py","Benchmark on approved research split",Paper1
+C05,"False-positive self-report can attenuate implicit signals",VALIDATED,"Confusion validation API calibration profile and targeted tests","Calibration impact on held-out real participants",Paper1
+C06,"Current automated tests demonstrate scientific validity",REJECTED,"Engineering tests only","External labels baselines uncertainty and statistical evaluation",None
+C07,"Micro-interactions improve bottleneck detection beyond macro telemetry",PROPOSED,"No approved comparative study yet","Pre-registered baseline and ablation experiment",Paper1
+C08,"Human calibration reduces false positives without unacceptable recall loss",PROPOSED,"Product behavior and synthetic tests only","Held-out calibration experiment with confidence intervals",Paper1
+C09,"Spatial cohort aggregation predicts teacher-confirmed bottlenecks",PROPOSED,"Coordinate heatmap implementation only","Teacher annotation study and localization metrics",Paper1
+C10,"Detected bottlenecks predict quiz and exam outcomes",PROPOSED,"Quiz generation exists but outcome storage/linkage is not research-ready","Assessment mapping and prospective outcome collection",Paper1
+C11,"EduPulse recommendations improve learning outcomes",FUTURE,"No causal intervention study","Randomized stepped-wedge or matched intervention study",Paper2+
+C12,"A de-identified feature dataset can be released",PROPOSED,"Privacy and pseudonymization components exist","Approval consent disclosure-risk review and dataset card",Paper1/Artifact
