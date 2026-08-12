@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Academic research presentation for EduPulse Learning Analytics" />
+  <title>EduPulse — Phát hiện điểm nghẽn nhận thức từ vi tương tác học tập</title>
+  <style>
+    :root {
+      --navy: #16324f;
+      --blue: #2166a5;
+      --cyan: #38a3a5;
+      --red: #b74b4b;
+      --amber: #b97915;
+      --green: #287a5b;
+      --ink: #18202a;
+      --muted: #5f6b76;
+      --line: #dce3e9;
+      --soft: #f3f6f8;
+      --paper: #ffffff;
+      --shadow: 0 18px 50px rgba(14, 35, 55, .18);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #e8edf1; }
+    body {
+      font-family: "Noto Sans", "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .slide {
+      display: none;
+      position: relative;
+      width: min(calc(100vw - 36px), calc((100vh - 36px) * 16 / 9));
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      padding: 5.7% 6.1% 5.1%;
+      isolation: isolate;
+    }
+
+    .slide.active { display: block; }
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 1.25%;
+      background: linear-gradient(90deg, var(--navy) 0 62%, var(--cyan) 62% 100%);
+      z-index: -1;
+    }
+
+    .frame-title {
+      margin: 0 0 2.2%;
+      padding: 0 0 1.2%;
+      color: var(--navy);
+      border-bottom: 2px solid var(--line);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(24px, 2.4vw, 42px);
+      line-height: 1.08;
+      font-weight: 700;
+    }
+
+    .kicker {
+      color: var(--blue);
+      font-size: clamp(11px, .82vw, 15px);
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 1.1%;
+    }
+
+    h2, h3 { color: var(--navy); }
+    h3 { margin: 0 0 8px; font-size: clamp(14px, 1.17vw, 21px); }
+    p { margin: .4em 0; line-height: 1.38; }
+    ul, ol { margin: .45em 0 .45em 1.15em; padding: 0; }
+    li { margin: .31em 0; line-height: 1.33; }
+    li::marker { color: var(--blue); }
+    strong { color: var(--navy); }
+    em { color: #36495a; }
+
+    .lead {
+      font-size: clamp(18px, 1.65vw, 29px);
+      line-height: 1.33;
+      color: #293746;
+    }
+
+    .small { font-size: clamp(10px, .82vw, 15px); }
+    .tiny { font-size: clamp(9px, .69vw, 12.5px); }
+    .muted { color: var(--muted); }
+    .accent { color: var(--blue); }
+    .danger { color: var(--red); }
+    .success { color: var(--green); }
+
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3%; align-items: stretch; }
+    .cols.three { grid-template-columns: repeat(3, 1fr); gap: 2%; }
+    .cols.wide-left { grid-template-columns: 1.2fr .8fr; }
+    .cols.wide-right { grid-template-columns: .82fr 1.18fr; }
+
+    .block {
+      background: var(--soft);
+      border-left: 5px solid var(--blue);
+      border-radius: 2px;
+      padding: 2.1% 2.5%;
+    }
+    .block + .block { margin-top: 2%; }
+    .block.alert { border-color: var(--red); background: #fff4f3; }
+    .block.green { border-color: var(--green); background: #f0f8f4; }
+    .block.amber { border-color: var(--amber); background: #fff8ec; }
+    .block h3 { margin-bottom: .35em; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--blue);
+      padding: 5% 5.5%;
+      background: #fff;
+      min-height: 100%;
+    }
+    .card .num {
+      display: inline-grid;
+      place-items: center;
+      width: 2.1em;
+      height: 2.1em;
+      margin-bottom: .6em;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(9px, .77vw, 14px);
+      line-height: 1.25;
+    }
+    th {
+      background: var(--navy);
+      color: white;
+      text-align: left;
+      padding: .62em .7em;
+      font-weight: 700;
+    }
+    td { border-bottom: 1px solid var(--line); padding: .58em .7em; vertical-align: top; }
+    tr:nth-child(even) td { background: #f7f9fa; }
+
+    .status {
+      display: inline-block;
+      border-radius: 999px;
+      padding: .22em .63em;
+      font-size: .82em;
+      font-weight: 800;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+    .implemented { color: #245b87; background: #e4f1fb; }
+    .validated { color: #206246; background: #e2f4ea; }
+    .proposed { color: #87590e; background: #fff0cf; }
+    .future { color: #6d6676; background: #ece9ef; }
+
+    .equation {
+      margin: 1.5% 0;
+      padding: 1.6% 2.2%;
+      text-align: center;
+      border: 1px solid #ccd8e2;
+      background: #f9fbfc;
+      color: var(--navy);
+      font: italic clamp(14px, 1.3vw, 23px) Georgia, "Times New Roman", serif;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      align-items: center;
+      gap: 1.4%;
+      margin: 2.4% 0;
+    }
+    .pipe {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 104px;
+      padding: 9% 5%;
+      text-align: center;
+      border: 1px solid #bfcbd5;
+      border-radius: 4px;
+      background: linear-gradient(#fff, #f3f7f9);
+      color: var(--navy);
+      font-size: clamp(10px, .78vw, 14px);
+      font-weight: 750;
+      line-height: 1.22;
+    }
+    .pipe:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -16%;
+      color: var(--blue);
+      font-size: 1.6em;
+      z-index: 2;
+    }
+    .pipe.highlight { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    .quote {
+      position: relative;
+      margin: 2% 4%;
+      padding: 2.4% 3.4%;
+      border-left: 7px solid var(--cyan);
+      background: #f3f9f9;
+      color: #243b4c;
+      font: clamp(17px, 1.55vw, 28px)/1.42 Georgia, "Times New Roman", serif;
+    }
+
+    .refs {
+      columns: 2;
+      column-gap: 4%;
+      margin: 0;
+      padding-left: 1.4em;
+      font-size: clamp(8.5px, .66vw, 12px);
+      line-height: 1.25;
+    }
+    .refs li { break-inside: avoid; margin: 0 0 .63em; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    sup.cite a { font-weight: 700; }
+
+    .footnote {
+      position: absolute;
+      left: 6.1%;
+      right: 6.1%;
+      bottom: 3.9%;
+      color: var(--muted);
+      font-size: clamp(8px, .63vw, 11px);
+      line-height: 1.25;
+    }
+
+    .footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2.4%;
+      color: #63717d;
+      font-size: clamp(7px, .55vw, 10px);
+    }
+    .footer .section { position: absolute; left: 6.1%; bottom: 28%; }
+    .footer .counter { position: absolute; right: 4%; bottom: 28%; }
+
+    .title-slide {
+      color: white;
+      background:
+        radial-gradient(circle at 86% 17%, rgba(56,163,165,.3), transparent 25%),
+        linear-gradient(132deg, #102a43 0%, #163f65 64%, #1b6271 100%);
+      padding: 10.8% 8% 7%;
+    }
+    .title-slide::before { display: none; }
+    .title-slide .rule { width: 12%; height: 7px; background: var(--cyan); margin-bottom: 3.2%; }
+    .title-slide h1 {
+      max-width: 88%;
+      margin: 0;
+      font: 700 clamp(34px, 4vw, 70px)/1.08 Georgia, "Times New Roman", serif;
+      letter-spacing: -.02em;
+    }
+    .title-slide .subtitle {
+      max-width: 86%;
+      margin-top: 2.2%;
+      color: #d7e9f3;
+      font-size: clamp(17px, 1.55vw, 28px);
+      line-height: 1.4;
+    }
+    .title-slide .meta {
+      position: absolute;
+      left: 8%;
+      bottom: 8.5%;
+      color: #cfdee8;
+      font-size: clamp(10px, .82vw, 15px);
+      line-height: 1.6;
+    }
+    .title-slide .mark {
+      position: absolute;
+      right: 7%;
+      bottom: 7%;
+      font: 700 clamp(18px, 1.45vw, 26px) Georgia, serif;
+      color: #fff;
+      opacity: .85;
+    }
+
+    .takeaway {
+      position: absolute;
+      left: 6.1%; right: 6.1%; bottom: 6.3%;
+      padding: 1.1% 1.5%;
+      border-left: 5px solid var(--cyan);
+      background: #eef7f7;
+      color: #254454;
+      font-size: clamp(10px, .82vw, 15px);
+      font-weight: 650;
+    }
+
+    .controls {
+      position: fixed;
+      right: 16px;
+      bottom: 14px;
+      z-index: 20;
+      display: flex;
+      gap: 7px;
+      opacity: .25;
+      transition: opacity .2s;
+    }
+    .controls:hover { opacity: 1; }
+    .controls button {
+      border: 0;
+      border-radius: 4px;
+      padding: 8px 11px;
+      color: white;
+      background: var(--navy);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .progress {
+      position: fixed;
+      left: 0; bottom: 0;
+      height: 4px;
+      background: var(--cyan);
+      transition: width .2s ease;
+      z-index: 30;
+    }
+
+    body.overview { overflow: auto; }
+    body.overview .deck {
+      height: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    body.overview .slide { display: block; width: 100%; cursor: pointer; padding: 5.7% 6.1% 5.1%; }
+
+    @media print {
+      @page { size: 13.333in 7.5in; margin: 0; }
+      html, body { background: white; overflow: visible; }
+      .deck { display: block; width: auto; height: auto; padding: 0; }
+      .slide, .slide.active {
+        display: block;
+        width: 13.333in;
+        height: 7.5in;
+        aspect-ratio: auto;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+      }
+      .controls, .progress { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="EduPulse research presentation">
+
+    <section class="slide title-slide active" data-section="Mở đầu">
+      <div class="rule"></div>
+      <div class="kicker" style="color:#81d4d5">Learning Analytics · Research Proposal</div>
+      <h1>Phát hiện điểm nghẽn nhận thức từ vi tương tác học tập</h1>
+      <p class="subtitle">Một tiếp cận <strong style="color:#fff">không dùng cảm biến sinh trắc</strong>, có ngữ cảnh không gian–thời gian–cohort và được hiệu chuẩn bởi con người</p>
+      <div class="meta">
+        <div><strong style="color:#fff">Working title:</strong> Human-Calibrated Multimodal Cognitive Bottleneck Detection from Learning Micro-Interactions</div>
+        <div>Tác giả: [Điền họ tên] · Đơn vị: [Điền đơn vị] · 2026</div>
+      </div>
+      <div class="mark">EduPulse</div>
+    </section>
+
+    <section class="slide" data-section="Định vị">
+      <div class="kicker">Research purpose</div>
+      <h1 class="frame-title">Mục đích nghiên cứu</h1>
+      <div class="quote">
+        Cung cấp cho giảng viên bằng chứng sớm, có thể kiểm chứng về <strong>nơi một cohort gặp điểm nghẽn kiến thức</strong> trong lúc đọc tài liệu số — mà không suy diễn thành chẩn đoán trạng thái tâm lý của từng người học.
+      </div>
+      <div class="cols three" style="margin-top:3%">
+        <div class="card"><span class="num">1</span><h3>Nhận biết sớm</h3><p class="small">Định vị trang/vùng kiến thức cần được xem lại trước khi lỗi học tập tích lũy.</p></div>
+        <div class="card"><span class="num">2</span><h3>Ra quyết định</h3><p class="small">Ưu tiên tín hiệu đủ độ tin cậy, giảm tải cảnh báo sai cho giảng viên.</p></div>
+        <div class="card"><span class="num">3</span><h3>Bảo vệ người học</h3><p class="small">Tổng hợp ở cấp cohort, tối thiểu hóa dữ liệu và duy trì quyền đồng thuận/rút lui.</p></div>
+      </div>
+      <div class="takeaway">Đối tượng dự đoán là <em>bằng chứng bottleneck</em>, không phải “đọc suy nghĩ” hay gắn nhãn sinh viên.</div>
+    </section>
+
+    <section class="slide" data-section="Động lực">
+      <div class="kicker">Motivation</div>
+      <h1 class="frame-title">Vì sao bài toán này đáng nghiên cứu?</h1>
+      <div class="cols wide-left">
+        <div>
+          <div class="block">
+            <h3>Khoảng trống quan sát</h3>
+            <p class="small">Trong hoạt động đọc slide/tài liệu số, giảng viên thường chỉ thấy kết quả muộn qua bài quiz, bài thi hoặc câu hỏi trực tiếp.</p>
+          </div>
+          <div class="block alert">
+            <h3>Proxy yếu dễ gây kết luận sai</h3>
+            <p class="small">Dwell dài có thể là đọc kỹ, rời máy hoặc nội dung phức tạp. Highlight/note có thể là chủ động học, không nhất thiết là bối rối.<sup class="cite"><a href="#ref-1">[1]</a><a href="#ref-6">[6]</a></sup></p>
+          </div>
+          <div class="block green">
+            <h3>Cơ hội từ dấu vết tự nhiên</h3>
+            <p class="small">Selection, scroll reversal, revisit, annotation, note và help-seeking tạo các “neo nhận thức” giàu ngữ cảnh mà không cần camera/microphone.</p>
+          </div>
+        </div>
+        <div class="equation" style="display:grid; place-items:center; min-height:78%; margin:0; font-size:clamp(17px,1.6vw,29px)">
+          Observable trace<br>≠<br>Latent cognitive state<br>≠<br>Learning outcome
+        </div>
+      </div>
+      <div class="footnote">Nền lý thuyết: confusion có thể hỗ trợ học nếu được giải quyết; ICAP phân biệt mức độ tham gia từ hành vi quan sát được.</div>
+    </section>
+
+    <section class="slide" data-section="Định vị">
+      <div class="kicker">Construct definition</div>
+      <h1 class="frame-title">Khóa khái niệm trước khi xây mô hình</h1>
+      <table>
+        <thead><tr><th style="width:22%">Khái niệm</th><th>Định nghĩa thao tác</th><th style="width:31%">Biên diễn giải</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Productive struggle</strong></td><td>Khó khăn tạm thời đi kèm xử lý sâu và được giải quyết.</td><td>Không nên tự động phát cảnh báo.</td></tr>
+          <tr><td><strong>Unresolved bottleneck</strong></td><td>Khó khăn kéo dài/lặp lại, hội tụ ở nội dung cụ thể hoặc liên hệ với help-seeking/outcome kém.</td><td>Target chính của Paper 1.</td></tr>
+          <tr><td><strong>Engagement anchor</strong></td><td>Tương tác chủ động/kiến tạo: highlight, note, self-explanation.</td><td>Có thể tích cực; cần engagement head.</td></tr>
+          <tr><td><strong>Noise</strong></td><td>Idle, accidental selection, spam, schema/timestamp lỗi.</td><td>Phải lọc và báo data quality.</td></tr>
+        </tbody>
+      </table>
+      <div class="block amber" style="margin-top:2.2%">
+        <strong>Đơn vị phân tích ưu tiên:</strong> page/region × cohort × time window; student-level chỉ phục vụ mô hình dưới giao thức nghiên cứu được phê duyệt.
+      </div>
+      <div class="takeaway">Construct validity là phần cốt lõi của phương pháp, không phải lời giải thích bổ sung sau khi có kết quả.</div>
+    </section>
+
+    <section class="slide" data-section="Khoảng trống">
+      <div class="kicker">Research gap</div>
+      <h1 class="frame-title">Nghiên cứu trước đã làm gì — còn thiếu gì?</h1>
+      <table>
+        <thead><tr><th>Dòng nghiên cứu</th><th>Đã biết</th><th>Khoảng trống EduPulse nhắm tới</th></tr></thead>
+        <tbody>
+          <tr><td>Confusion / affect dynamics</td><td>Confusion có thể hữu ích hoặc dẫn tới disengagement.<sup class="cite"><a href="#ref-1">[1]</a><a href="#ref-2">[2]</a></sup></td><td>Tách productive struggle khỏi bottleneck chưa được giải quyết.</td></tr>
+          <tr><td>Sensor-free detection</td><td>Clickstream, log chi tiết và text đã được dùng để dự đoán affect/confusion.<sup class="cite"><a href="#ref-3">[3]</a><a href="#ref-4">[4]</a></sup></td><td>Không thể claim novelty chỉ vì “kết hợp hành vi + văn bản”.</td></tr>
+          <tr><td>Sequence analytics</td><td>Thứ tự hành động mang thông tin hơn count tĩnh.<sup class="cite"><a href="#ref-5">[5]</a></sup></td><td>Cần gắn sequence với vị trí trên tài liệu và sự hội tụ cohort.</td></tr>
+          <tr><td>Model calibration</td><td>Accuracy cao không đảm bảo xác suất đáng tin.<sup class="cite"><a href="#ref-9">[9]</a></sup></td><td>Cần calibration + false-alert workload cho quyết định giảng dạy.</td></tr>
+          <tr><td>Ethical MMLA</td><td>Learning analytics có nguy cơ chuyển thành giám sát.<sup class="cite"><a href="#ref-10">[10]</a><a href="#ref-11">[11]</a></sup></td><td>Consent, agency, privacy phải nằm trong thiết kế phương pháp.</td></tr>
+        </tbody>
+      </table>
+      <div class="footnote">Literature hiện là scoping-review seed; novelty chỉ được khóa sau systematic search và closest-work audit.</div>
+    </section>
+
+    <section class="slide" data-section="Bài toán">
+      <div class="kicker">Problem formulation</div>
+      <h1 class="frame-title">Bài toán nghiên cứu</h1>
+      <p class="lead">Với course <em>C</em>, sinh viên <em>s</em>, tài liệu <em>m</em>, trang/vùng <em>r</em> và chuỗi event <em>E</em> theo thời gian:</p>
+      <div class="equation">
+        p<sub>individual</sub> = P(unresolved difficulty evidence | E<sub>s,m,r,t</sub>, context)
+      </div>
+      <div class="equation">
+        p<sub>cohort</sub> = P(cohort bottleneck | {E<sub>s,m,r,t</sub>}<sub>s∈C</sub>, content, labels)
+      </div>
+      <div class="cols" style="margin-top:2%">
+        <div class="block"><h3>Đầu vào</h3><p class="small">Temporal sequence · spatial geometry · content complexity · semantic intent · cohort convergence.</p></div>
+        <div class="block green"><h3>Đầu ra</h3><p class="small">Xác suất đã hiệu chuẩn + uncertainty + evidence summary ở cấp page/region/cohort.</p></div>
+      </div>
+      <div class="takeaway">Ràng buộc: generalize qua participant/material/course; không dùng biometric sensor; không hiển thị phán xét cá nhân ngoài protocol.</div>
+    </section>
+
+    <section class="slide" data-section="Mục tiêu">
+      <div class="kicker">Objectives</div>
+      <h1 class="frame-title">Mục tiêu nghiên cứu có thể kiểm chứng</h1>
+      <div class="cols three">
+        <div class="card">
+          <span class="num">O1</span><h3>Incremental validity</h3>
+          <p class="small">Định lượng giá trị bổ sung của micro-interactions so với dwell/page-view và raw count.</p>
+          <p class="tiny muted">AUPRC · Brier · ablation −micro</p>
+        </div>
+        <div class="card">
+          <span class="num">O2</span><h3>Human calibration</h3>
+          <p class="small">Kiểm tra feedback false-positive và nhãn đa nguồn có giảm cảnh báo sai mà giữ recall hay không.</p>
+          <p class="tiny muted">FPR@fixed recall · ECE · reliability</p>
+        </div>
+        <div class="card">
+          <span class="num">O3</span><h3>Spatial–cohort validity</h3>
+          <p class="small">Đánh giá hội tụ của nhiều người học ở cùng vùng có dự đoán teacher label/outcome tốt hơn count hay không.</p>
+          <p class="tiny muted">Region AUPRC · IoU · Recall@K</p>
+        </div>
+      </div>
+      <div class="block alert" style="margin-top:2.2%">
+        <strong>Ngoài phạm vi Paper 1:</strong> chứng minh khuyến nghị làm tăng kết quả học — cần intervention/stepped-wedge study riêng.
+      </div>
+    </section>
+
+    <section class="slide" data-section="Câu hỏi nghiên cứu">
+      <div class="kicker">Research questions & hypotheses</div>
+      <h1 class="frame-title">Từ câu hỏi nghiên cứu tới kiểm định</h1>
+      <table>
+        <thead><tr><th style="width:10%">RQ / H</th><th>Câu hỏi / giả thuyết</th><th style="width:30%">So sánh quyết định</th></tr></thead>
+        <tbody>
+          <tr><td><strong>RQ1 / H1–H2</strong></td><td>Micro-interactions có nâng chất lượng phát hiện bottleneck?</td><td>Full vs dwell-only; Full vs −micro</td></tr>
+          <tr><td><strong>RQ2 / H3</strong></td><td>Human calibration có giảm false alert mà không mất recall quan trọng?</td><td>Calibrated vs uncalibrated</td></tr>
+          <tr><td><strong>RQ3 / H4</strong></td><td>Spatial cohort convergence có tốt hơn raw interaction count?</td><td>DeepSets/spatial vs count; −spatial; −unique-user</td></tr>
+          <tr><td><strong>H5</strong></td><td>Tín hiệu gần thời điểm học liên hệ với quiz tốt hơn exam xa?</td><td>Near-term quiz head vs delayed exam head</td></tr>
+          <tr><td><strong>H6</strong></td><td>Mô hình giữ hiệu năng khi chuyển course?</td><td>Leave-one-course-out relative drop</td></tr>
+        </tbody>
+      </table>
+      <div class="block amber" style="margin-top:2%"><strong>Preregistration:</strong> khóa minimum-relevant effect, recall tolerance và analysis plan sau pilot prevalence/power — trước final test.</div>
+    </section>
+
+    <section class="slide" data-section="Hiện trạng">
+      <div class="kicker">Current evidence</div>
+      <h1 class="frame-title">Nền tảng đã có ≠ đóng góp khoa học đã được xác thực</h1>
+      <table>
+        <thead><tr><th>Thành phần</th><th>Hiện trạng</th><th>Bằng chứng / thiếu hụt chính</th></tr></thead>
+        <tbody>
+          <tr><td>Telemetry: dwell, scroll, hover, selection, geometry</td><td><span class="status implemented">IMPLEMENTED</span></td><td>Đã có code/schema; thiếu data-quality report theo approved protocol.</td></tr>
+          <tr><td>Note, highlight, drawing, lasso, Ask AI</td><td><span class="status implemented">IMPLEMENTED</span></td><td>Đã map vào signal; cần provenance audit.</td></tr>
+          <tr><td>Heuristic score + coordinate heatmap</td><td><span class="status implemented">IMPLEMENTED</span></td><td>Là frozen baseline; trọng số chưa phải “cognitive constants”.</td></tr>
+          <tr><td>False-positive attenuation loop</td><td><span class="status validated">VALIDATED*</span></td><td>*Validated kỹ thuật; chưa có impact trên held-out participants.</td></tr>
+          <tr><td>Research model + external labels</td><td><span class="status proposed">PROPOSED</span></td><td>Chưa benchmark trên dữ liệu nghiên cứu được phê duyệt.</td></tr>
+          <tr><td>Improved learning outcome</td><td><span class="status future">FUTURE</span></td><td>Cần causal intervention study.</td></tr>
+        </tbody>
+      </table>
+      <div class="takeaway">Engineering tests chứng minh code đúng contract; không tự động chứng minh construct validity hoặc external validity.</div>
+    </section>
+
+    <section class="slide" data-section="Dữ liệu">
+      <div class="kicker">Signals & unit of analysis</div>
+      <h1 class="frame-title">Từ hành động rời rạc tới chuỗi bằng chứng có ngữ cảnh</h1>
+      <div class="pipeline">
+        <div class="pipe">Passive<br><span class="muted">dwell · scroll</span></div>
+        <div class="pipe">Attention<br><span class="muted">hover · selection · revisit</span></div>
+        <div class="pipe">Active<br><span class="muted">highlight · draw · lasso</span></div>
+        <div class="pipe">Constructive<br><span class="muted">note · self-explanation</span></div>
+        <div class="pipe">Help-seeking<br><span class="muted">Ask AI · direct chat</span></div>
+        <div class="pipe highlight">Student–page<br>event window</div>
+      </div>
+      <div class="cols">
+        <div class="block">
+          <h3>Context đi kèm mỗi event</h3>
+          <p class="small">Timestamp/age · normalized bounding box · device · content version · page density · idle/anomaly · schema/model version.</p>
+        </div>
+        <div class="block green">
+          <h3>Chống pseudoreplication</h3>
+          <p class="small">Sample headline là participant/course, không phải hàng triệu event; dùng distinct users, grouped split và cluster-aware statistics.</p>
+        </div>
+      </div>
+      <div class="footnote">Các family dựa trên event taxonomy của protocol và được diễn giải thận trọng theo ICAP.<sup class="cite"><a href="#ref-6">[6]</a></sup></div>
+    </section>
+
+    <section class="slide" data-section="Phương pháp">
+      <div class="kicker">Proposed method</div>
+      <h1 class="frame-title">Pipeline nghiên cứu đề xuất</h1>
+      <div class="pipeline">
+        <div class="pipe">Event + text +<br>content features</div>
+        <div class="pipe">Event encoder +<br>GRU sequence</div>
+        <div class="pipe">Spatial<br>encoder</div>
+        <div class="pipe">Cohort<br>DeepSets</div>
+        <div class="pipe">Masked<br>multi-task heads</div>
+        <div class="pipe highlight">Calibration +<br>cohort output</div>
+      </div>
+      <div class="cols wide-right">
+        <div>
+          <div class="block"><h3>Engagement head</h3><p class="small">Tách hành vi chủ động tích cực khỏi unresolved difficulty.</p></div>
+          <div class="block amber"><h3>Missing-label masks</h3><p class="small">Không coi nhãn thiếu là negative; mỗi source giữ loss riêng.</p></div>
+        </div>
+        <div>
+          <div class="equation">L = Σ<sub>k</sub> λ<sub>k</sub> · MaskedBCE(y<sub>k</sub>, p<sub>k</sub>) + βL<sub>engagement</sub> + γL<sub>reg</sub></div>
+          <div class="block green"><h3>Đầu ra quyết định</h3><p class="small">Probability per task · uncertainty metadata · top modalities · unique-student count · sample-size warning.</p></div>
+        </div>
+      </div>
+      <div class="takeaway">GRU là prototype có chủ ý: ưu tiên effective sample size và reproducibility; Transformer chỉ là challenger nếu dữ liệu đủ.</div>
+    </section>
+
+    <section class="slide" data-section="Ground truth">
+      <div class="kicker">Human evidence & ground truth</div>
+      <h1 class="frame-title">Không có một cột “ground truth” duy nhất</h1>
+      <table>
+        <thead><tr><th>Nguồn</th><th>Đo điều gì?</th><th>Ưu điểm</th><th>Bias / granularity</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Self-report</strong></td><td>Momentary difficulty</td><td>Gần thời điểm trải nghiệm</td><td>Response/selection bias; student–window</td></tr>
+          <tr><td><strong>Teacher label</strong></td><td>Cohort bottleneck</td><td>Ý nghĩa sư phạm, định vị được</td><td>Rater subjectivity; page/region</td></tr>
+          <tr><td><strong>Quiz item</strong></td><td>Near-term knowledge gap</td><td>Outcome gần, có thể map objective</td><td>Phụ thuộc item quality; item–attempt</td></tr>
+          <tr><td><strong>Exam item</strong></td><td>Delayed outcome</td><td>Giá trị học tập dài hơn</td><td>Nhiều confounder, temporal distance</td></tr>
+        </tbody>
+      </table>
+      <div class="cols" style="margin-top:2.2%">
+        <div class="block"><strong>Reliability:</strong> double-rate ≥20% sampled pages/regions nếu nguồn lực cho phép; Cohen/weighted κ + adjudication.</div>
+        <div class="block green"><strong>Provenance:</strong> giữ source, target, granularity, timestamp, sampling probability và rater version.</div>
+      </div>
+      <div class="takeaway">Multi-task supervision mô hình hóa sự khác biệt giữa các quan sát, thay vì che giấu chúng trong một label tổng hợp.</div>
+    </section>
+
+    <section class="slide" data-section="Novelty">
+      <div class="kicker">Novelty boundary</div>
+      <h1 class="frame-title">Novelty nằm ở tổ hợp nào?</h1>
+      <div class="cols three">
+        <div class="card"><span class="num">N1</span><h3>Temporal–spatial evidence</h3><p class="small">Chuỗi micro-interaction được neo vào vùng nội dung, thay vì aggregate click count không ngữ cảnh.</p></div>
+        <div class="card"><span class="num">N2</span><h3>Cohort convergence</h3><p class="small">Permutation-invariant aggregation đo nhiều người cùng gặp khó ở một knowledge region; giảm repeated-event inflation.</p></div>
+        <div class="card"><span class="num">N3</span><h3>Human-calibrated multi-source model</h3><p class="small">Feedback false-positive + teacher + assessment giữ provenance, kèm calibrated probability và uncertainty.</p></div>
+      </div>
+      <div class="cols" style="margin-top:2%">
+        <div class="block green"><h3>Định vị được phép</h3><p class="small">Sensor-free · spatial · cohort-aware · time-aware · human-calibrated · privacy-first.</p></div>
+        <div class="block alert"><h3>Không claim</h3><p class="small">“Kết hợp behavior + text là mới”; “đọc được confusion”; “cải thiện học tập”; “generalize toàn giáo dục”.</p></div>
+      </div>
+      <div class="footnote">Novelty là giả thuyết cần closest-work audit và ablation chứng minh, chưa phải kết luận từ implementation hiện tại.</div>
+    </section>
+
+    <section class="slide" data-section="Đóng góp">
+      <div class="kicker">Expected contributions</div>
+      <h1 class="frame-title">Đóng góp dự kiến — mỗi claim có một evidence gate</h1>
+      <table>
+        <thead><tr><th style="width:22%">Đóng góp</th><th>Nội dung</th><th style="width:31%">Điều kiện để claim</th></tr></thead>
+        <tbody>
+          <tr><td><strong>C1 · Problem/construct</strong></td><td>Formulation cohort cognitive bottleneck, phân biệt engagement–difficulty–noise.</td><td>Construct protocol + label validity + error analysis.</td></tr>
+          <tr><td><strong>C2 · Method</strong></td><td>Temporal–spatial multi-task cohort model với human calibration.</td><td>Beat/qualify strong baselines; preregistered ablation + CI.</td></tr>
+          <tr><td><strong>C3 · Empirical</strong></td><td>Đánh giá prospective trên 3–5 courses với multi-source evidence.</td><td>Approved dataset + course holdout; nếu 1 course chỉ gọi internal validation.</td></tr>
+          <tr><td><strong>C4 · Artifact</strong></td><td>Schema, protocol, code, synthetic fixtures và feature dataset khi được phép.</td><td>Ethics approval + disclosure-risk review + data/model card.</td></tr>
+        </tbody>
+      </table>
+      <div class="block amber" style="margin-top:2%"><strong>Fallback khoa học:</strong> nếu model không hơn XGBoost, contribution chuyển sang construct/protocol/dataset finding — không đổi metric sau khi xem test.</div>
+    </section>
+
+    <section class="slide" data-section="Đánh giá">
+      <div class="kicker">Evaluation protocol</div>
+      <h1 class="frame-title">Thiết kế đánh giá chống leakage và overclaim</h1>
+      <div class="cols wide-left">
+        <div>
+          <table>
+            <thead><tr><th>Trục</th><th>Thiết kế / metric</th></tr></thead>
+            <tbody>
+              <tr><td>Discrimination</td><td><strong>AUPRC</strong> primary; AUROC, F1, sensitivity phụ</td></tr>
+              <tr><td>Calibration</td><td>Brier, ECE, slope/intercept, reliability curve</td></tr>
+              <tr><td>Localization</td><td>Region IoU, center distance, Recall@K</td></tr>
+              <tr><td>Usefulness</td><td>Lead time, alerts/week, false alerts/100 student-hours</td></tr>
+              <tr><td>Inference</td><td>95% CI; hierarchical cluster bootstrap; paired comparison</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="block"><h3>Baselines B0–B6</h3><p class="small">No-skill · dwell-only · raw count · production heuristic · logistic · boosted trees · single-task GRU.</p></div>
+          <div class="block green"><h3>Generalization</h3><p class="small">Leave-one-course-out + participant grouping + chronological cutoff; calibration set tách train/test.</p></div>
+          <div class="block alert"><h3>Leakage controls</h3><p class="small">Participant, material version, future outcome và calibration labels không được chảy qua folds.</p></div>
+        </div>
+      </div>
+      <div class="footnote">Ablations khóa trước: −micro, −text, −spatial, −temporal, −content, −human-calibration, −unique-user, single-task.</div>
+    </section>
+
+    <section class="slide" data-section="Ethics">
+      <div class="kicker">Ethics as method</div>
+      <h1 class="frame-title">Privacy và learner agency là ràng buộc thiết kế</h1>
+      <div class="pipeline" style="grid-template-columns:repeat(4,1fr); gap:3%; margin-top:3%">
+        <div class="pipe">Identity store<br><span class="muted">email / student ID</span></div>
+        <div class="pipe">Restricted linkage<br><span class="muted">rotating pseudonym</span></div>
+        <div class="pipe">Research features<br><span class="muted">no direct identifier</span></div>
+        <div class="pipe highlight">Cohort reporting<br><span style="opacity:.8">sample-size warning</span></div>
+      </div>
+      <div class="cols three" style="margin-top:3%">
+        <div class="block"><h3>Consent</h3><p class="small">Tự nguyện; không gộp với điều khoản học; mô tả provider và quyền withdrawal.</p></div>
+        <div class="block"><h3>Minimization</h3><p class="small">Không đưa raw private note, IP, fingerprint hay access token vào research features.</p></div>
+        <div class="block"><h3>Governance</h3><p class="small">Role-based access, retention, export audit, disclosure-risk review.</p></div>
+      </div>
+      <div class="footnote">Consent propensity có thể khác giữa nhóm người học; phải báo selection/missingness bias trước model fairness.<sup class="cite"><a href="#ref-10">[10]</a><a href="#ref-11">[11]</a></sup></div>
+    </section>
+
+    <section class="slide" data-section="Kế hoạch">
+      <div class="kicker">Study plan</div>
+      <h1 class="frame-title">Lộ trình từ research-ready tới empirical evidence</h1>
+      <table>
+        <thead><tr><th style="width:13%">Giai đoạn</th><th>Artifact chính</th><th>Exit gate</th></tr></thead>
+        <tbody>
+          <tr><td>W1 · Framing</td><td>Construct, literature log, claim registry</td><td>Không còn “dwell = confusion”; novelty map closest work</td></tr>
+          <tr><td>W2 · Governance</td><td>Consent, schema, annotation, item map</td><td>Mọi field có purpose/provenance; ethics route rõ</td></tr>
+          <tr><td>W3 · Baselines</td><td>Synthetic replay, B0–B5, split manifest</td><td>End-to-end reproducible; leakage tests pass</td></tr>
+          <tr><td>W4 · Model</td><td>GRU + spatial + DeepSets + calibration</td><td>Missing labels/modalities; ≥3 seeds; versioned output</td></tr>
+          <tr><td>W5 · Dry run</td><td>Ablation, bootstrap, reliability, error cases</td><td>Metrics reproducible từ per-unit predictions</td></tr>
+          <tr><td>W6 · Gate</td><td>Dossier, paper skeleton, professor briefing</td><td>GO pilot chỉ khi ethics, owner, pipeline và privacy đạt</td></tr>
+        </tbody>
+      </table>
+      <div class="block green" style="margin-top:2%"><strong>Đích sáu tuần:</strong> research-readiness package + reproducible prototype; không gọi là paper có kết quả thật nếu chưa có approved data.</div>
+    </section>
+
+    <section class="slide" data-section="Rủi ro">
+      <div class="kicker">Threats to validity</div>
+      <h1 class="frame-title">Rủi ro nghiên cứu và cơ chế giảm thiểu</h1>
+      <table>
+        <thead><tr><th>Rủi ro</th><th>Hệ quả</th><th>Giảm thiểu / cách scope claim</th></tr></thead>
+        <tbody>
+          <tr><td>Consent bias</td><td>Opt-in sample không đại diện</td><td>Báo selection process; compare permitted aggregates; sensitivity analysis</td></tr>
+          <tr><td>Label sparse/noisy</td><td>Học nhóm hay phản hồi hơn</td><td>Stratified prompts; sampling probability; multi-task masks</td></tr>
+          <tr><td>Pseudoreplication</td><td>Raw event N làm CI quá hẹp</td><td>Effective N; hierarchical cluster bootstrap; mixed effects</td></tr>
+          <tr><td>Productive-struggle FP</td><td>Can thiệp sai vào học sâu</td><td>Engagement/outcome head; error taxonomy; fixed-recall FPR</td></tr>
+          <tr><td>Silent-confusion FN</td><td>Không tương tác nên không quan sát được</td><td>Nêu coverage limitation; không claim detect mọi khó khăn</td></tr>
+          <tr><td>Một course</td><td>Không có external generalization</td><td>Gọi internal prospective validation; không overclaim</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-section="Kết luận">
+      <div class="kicker">Take-home message</div>
+      <h1 class="frame-title">Kết luận và quyết định cần xin ý kiến</h1>
+      <div class="quote">
+        EduPulse biến các vi tương tác học tập thành <strong>bằng chứng cohort-level có ngữ cảnh và độ bất định</strong>, nhằm hỗ trợ giảng viên nhận biết điểm nghẽn — không biến telemetry thành công cụ giám sát cá nhân.
+      </div>
+      <div class="cols three" style="margin-top:2.5%">
+        <div class="card"><span class="num">A</span><h3>Construct</h3><p class="small">Bottleneck formulation và ranh giới productive struggle đã đủ chặt?</p></div>
+        <div class="card"><span class="num">B</span><h3>Contribution</h3><p class="small">Temporal–spatial–cohort + human calibration có đúng hướng novelty?</p></div>
+        <div class="card"><span class="num">C</span><h3>Pilot</h3><p class="small">Chọn course, owner, ethics route và nguồn teacher/quiz labels nào?</p></div>
+      </div>
+      <div class="takeaway"><strong>Next gate:</strong> mentor review → literature audit → ethics/data contract → synthetic dry-run → quyết định GO/ITERATE cho pilot thật.</div>
+    </section>
+
+    <section class="slide" data-section="Tài liệu tham khảo">
+      <div class="kicker">References</div>
+      <h1 class="frame-title">Tài liệu tham khảo (1/2)</h1>
+      <ol class="refs">
+        <li id="ref-1">D'Mello, S., Lehman, B., Pekrun, R., & Graesser, A. (2014). Confusion can be beneficial for learning. <em>Learning and Instruction, 29</em>, 153–170. <a href="https://doi.org/10.1016/j.learninstruc.2012.05.003">doi:10.1016/j.learninstruc.2012.05.003</a></li>
+        <li id="ref-2">D'Mello, S. K., & Graesser, A. C. (2011). The half-life of cognitive-affective states during complex learning. <em>Cognition & Emotion, 25</em>(7), 1299–1308. <a href="https://doi.org/10.1080/02699931.2011.613668">doi:10.1080/02699931.2011.613668</a></li>
+        <li id="ref-3">Yang, D., Kraut, R., & Rosé, C. P. (2016). Exploring the effect of student confusion in massive open online courses. <em>Journal of Educational Data Mining, 8</em>(1). <a href="https://jedm.educationaldatamining.org/index.php/JEDM/article/view/JEDM2016-8-1">JEDM</a></li>
+        <li id="ref-4">Paquette, L. et al. (2014). Sensor-free affect detection. <em>Proceedings of the International Conference on Intelligent Tutoring Systems</em>. <a href="https://learninganalytics.upenn.edu/ryanbaker/ITS2014Paquetteetal.pdf">PDF</a></li>
+        <li id="ref-5">Kinnebrew, J. S., Loretz, K. M., & Biswas, G. (2013). A contextualized, differential sequence mining method to derive students' learning behavior patterns. <em>Journal of Educational Data Mining, 5</em>(1). <a href="https://jedm.educationaldatamining.org/index.php/JEDM/article/view/34">JEDM</a></li>
+        <li id="ref-6">Chi, M. T. H., & Wylie, R. (2014). The ICAP framework: Linking cognitive engagement to active learning outcomes. <em>Educational Psychologist, 49</em>(4), 219–243. <a href="https://doi.org/10.1080/00461520.2014.965823">doi:10.1080/00461520.2014.965823</a></li>
+      </ol>
+      <div class="footnote">Citation list được khởi tạo từ <code>research_docs/literature_matrix.csv</code>; cần kiểm tra metadata trong systematic-review pass trước submission.</div>
+    </section>
+
+    <section class="slide" data-section="Tài liệu tham khảo">
+      <div class="kicker">References</div>
+      <h1 class="frame-title">Tài liệu tham khảo (2/2)</h1>
+      <ol class="refs" start="7">
+        <li id="ref-7">Schneider, B., & Blikstein, P. (2015). Unraveling students' interaction around a tangible interface using multimodal learning analytics. <em>Journal of Educational Data Mining, 7</em>(3). <a href="https://jedm.educationaldatamining.org/index.php/JEDM/article/view/JEDM102/0">JEDM</a></li>
+        <li id="ref-8">Hur, P. et al. (2026). Exploration, interpretation, and confirmation in classroom analytics. <em>Journal of Educational Data Mining</em>. <a href="https://jedm.educationaldatamining.org/index.php/JEDM/article/view/1030">JEDM</a></li>
+        <li id="ref-9">Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On calibration of modern neural networks. <em>Proceedings of ICML</em>, 1321–1330. <a href="https://proceedings.mlr.press/v70/guo17a.html">PMLR</a></li>
+        <li id="ref-10">Prinsloo, P., Slade, S., & Khalil, M. (2023). Multimodal learning analytics: In-between privacy and encroachment. <em>British Journal of Educational Technology</em>. <a href="https://doi.org/10.1111/bjet.13373">doi:10.1111/bjet.13373</a></li>
+        <li id="ref-11">Disparities in students' propensity to consent to learning analytics. (2022). <em>International Journal of Artificial Intelligence in Education</em>. <a href="https://doi.org/10.1007/s40593-021-00254-2">doi:10.1007/s40593-021-00254-2</a></li>
+        <li id="ref-12">Alwahaby, H., Cukurova, M., Papamitsiou, Z., & Giannakos, M. (2022). The evidence of impact and ethical considerations of multimodal learning analytics: A systematic literature review. <a href="https://discovery.ucl.ac.uk/id/eprint/10143076/">UCL Discovery</a></li>
+      </ol>
+      <div class="block amber" style="margin-top:3%">
+        <strong>Research dossier nội bộ:</strong> vision/status, literature & hypotheses, methodology, data/ethics, evaluation protocol, roadmap, paper blueprint và claim–evidence registry trong <code>research_docs/</code>.
+      </div>
+    </section>
+
+  </main>
+
+  <div class="controls" aria-label="Slide controls">
+    <button type="button" onclick="prevSlide()" title="Trang trước (←)">←</button>
+    <button type="button" onclick="toggleOverview()" title="Tổng quan (O)">▦</button>
+    <button type="button" onclick="window.print()" title="In / PDF (P)">PDF</button>
+    <button type="button" onclick="nextSlide()" title="Trang sau (→)">→</button>
+  </div>
+  <div class="progress" aria-hidden="true"></div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const progress = document.querySelector('.progress');
+    let current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
+
+    slides.forEach((slide, index) => {
+      const footer = document.createElement('div');
+      footer.className = 'footer';
+      footer.innerHTML = `<span class="section">${slide.dataset.section || 'EduPulse Research'}</span><span class="counter">${index + 1} / ${slides.length}</span>`;
+      slide.appendChild(footer);
+      slide.addEventListener('click', () => {
+        if (document.body.classList.contains('overview')) {
+          current = index;
+          toggleOverview(false);
+        }
+      });
+    });
+
+    function showSlide(index) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+      history.replaceState(null, '', `#${current + 1}`);
+      document.title = `${current + 1}/${slides.length} · EduPulse Research`;
+    }
+
+    function nextSlide() { if (!document.body.classList.contains('overview')) showSlide(current + 1); }
+    function prevSlide() { if (!document.body.classList.contains('overview')) showSlide(current - 1); }
+    function toggleOverview(force) {
+      const on = typeof force === 'boolean' ? force : !document.body.classList.contains('overview');
+      document.body.classList.toggle('overview', on);
+      if (!on) showSlide(current);
+    }
+
+    addEventListener('keydown', event => {
+      if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(event.key)) { event.preventDefault(); nextSlide(); }
+      if (['ArrowLeft', 'PageUp', 'Backspace'].includes(event.key)) { event.preventDefault(); prevSlide(); }
+      if (event.key.toLowerCase() === 'o') toggleOverview();
+      if (event.key.toLowerCase() === 'p') window.print();
+      if (event.key === 'Home') showSlide(0);
+      if (event.key === 'End') showSlide(slides.length - 1);
+      if (event.key === 'Escape' && document.body.classList.contains('overview')) toggleOverview(false);
+    });
+
+    let touchX = null;
+    addEventListener('touchstart', event => { touchX = event.changedTouches[0].clientX; }, {passive:true});
+    addEventListener('touchend', event => {
+      if (touchX === null) return;
+      const dx = event.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 50) dx < 0 ? nextSlide() : prevSlide();
+      touchX = null;
+    }, {passive:true});
+
+    showSlide(current);
+  </script>
+</body>
+</html>
