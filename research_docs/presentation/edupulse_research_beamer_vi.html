@@ -552,7 +552,7 @@
       <div class="kicker">Proposed method</div>
       <h1 class="frame-title">Pipeline nghiên cứu đề xuất</h1>
       <div class="pipeline">
-        <div class="pipe">Event + text +<br>content features</div>
+        <div class="pipe">Event + LLM semantic +<br>content features</div>
         <div class="pipe">Event encoder +<br>GRU sequence</div>
         <div class="pipe">Spatial<br>encoder</div>
         <div class="pipe">Cohort<br>DeepSets</div>
@@ -570,6 +570,63 @@
         </div>
       </div>
       <div class="takeaway">GRU là prototype có chủ ý: ưu tiên effective sample size và reproducibility; Transformer chỉ là challenger nếu dữ liệu đủ.</div>
+    </section>
+
+    <section class="slide" data-section="AI / LLM">
+      <div class="kicker">Role of AI & large language models</div>
+      <h1 class="frame-title">AI/LLM đóng vai trò gì trong hướng nghiên cứu?</h1>
+      <div class="cols" style="grid-template-columns:repeat(2,1fr); gap:2.2%">
+        <div class="block">
+          <h3>1 · Hiểu nội dung học liệu</h3>
+          <p class="small">Biểu diễn ngữ nghĩa slide; trích xuất khái niệm, learning objective và quan hệ topic–page–quiz; nhận diện công thức, bảng và vùng nội dung phức tạp.</p>
+        </div>
+        <div class="block green">
+          <h3>2 · Hiểu ý định tương tác</h3>
+          <p class="small">Phân biệt note/câu hỏi thể hiện <em>khó hiểu, tò mò, ôn tập</em> hay <em>self-explanation</em>; hỗ trợ văn bản Việt–Anh và code-switching.</p>
+        </div>
+        <div class="block amber">
+          <h3>3 · Hỗ trợ human calibration</h3>
+          <p class="small">Chọn mẫu đa dạng để teacher review, tóm tắt evidence theo region và gợi ý label; con người xác nhận hoặc bác bỏ, LLM không tự tạo ground truth.</p>
+        </div>
+        <div class="block">
+          <h3>4 · Chuyển phân tích thành hành động</h3>
+          <p class="small">Tạo giải thích, câu hỏi chẩn đoán hoặc tài liệu bổ sung dựa trên evidence và course content; hiệu quả sư phạm phải được kiểm định ở Paper 2.</p>
+        </div>
+      </div>
+      <div class="quote" style="margin:2.1% 0 0; padding:1.5% 2.2%; font-size:clamp(15px,1.2vw,22px)">
+        LLM là <strong>semantic copilot</strong> cho mô hình và giảng viên — không phải bộ phán quyết trạng thái nhận thức của sinh viên.
+      </div>
+      <div class="footnote">LLM có tiềm năng hỗ trợ cá nhân hóa, feedback và teacher augmentation, nhưng kéo theo hallucination, bias và privacy risk.<sup class="cite"><a href="#ref-13">[13]</a><a href="#ref-14">[14]</a></sup></div>
+    </section>
+
+    <section class="slide" data-section="AI / LLM">
+      <div class="kicker">LLM integration & validation</div>
+      <h1 class="frame-title">Tích hợp LLM như một module có thể kiểm định</h1>
+      <div class="pipeline" style="grid-template-columns:repeat(5,1fr)">
+        <div class="pipe">Sanitized text +<br>course content</div>
+        <div class="pipe">Frozen embedding /<br>constrained LLM</div>
+        <div class="pipe">Intent + concept +<br>semantic features</div>
+        <div class="pipe">GRU · spatial ·<br>cohort model</div>
+        <div class="pipe highlight">Calibrated output +<br>teacher evidence</div>
+      </div>
+      <div class="cols wide-left">
+        <div>
+          <table>
+            <thead><tr><th>AI-RQ</th><th>Kiểm định</th></tr></thead>
+            <tbody>
+              <tr><td>Semantic value?</td><td>Full vs <strong>−LLM-semantic</strong>; TF–IDF / small classifier / embedding baseline</td></tr>
+              <tr><td>Language robustness?</td><td>Vietnamese, English và code-switch subsets; human-labeled intent F1</td></tr>
+              <tr><td>Stable enough?</td><td>Prompt/model-version consistency; calibration và error taxonomy</td></tr>
+              <tr><td>Useful to teachers?</td><td>Blinded correctness, actionability, edit rate và review time</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="block alert"><h3>Không được phép</h3><p class="small">Generated label = truth · gửi raw private notes thiếu consent · tạo claim không có evidence · giải thích như quan hệ nhân quả.</p></div>
+          <div class="block green"><h3>Guardrails</h3><p class="small">PII redaction · retrieval từ approved course corpus · citation/evidence link · prompt/model/version log · human approval · local-model fallback.</p></div>
+        </div>
+      </div>
+      <div class="takeaway">Mọi lợi ích của LLM phải sống sót qua ablation; hallucination và data leakage được đánh giá như lỗi phương pháp, không chỉ lỗi UX.<sup class="cite"><a href="#ref-15">[15]</a><a href="#ref-16">[16]</a></sup></div>
     </section>
 
     <section class="slide" data-section="Ground truth">
@@ -643,7 +700,7 @@
           <div class="block alert"><h3>Leakage controls</h3><p class="small">Participant, material version, future outcome và calibration labels không được chảy qua folds.</p></div>
         </div>
       </div>
-      <div class="footnote">Ablations khóa trước: −micro, −text, −spatial, −temporal, −content, −human-calibration, −unique-user, single-task.</div>
+      <div class="footnote">Ablations khóa trước: −micro, −text, <strong>−LLM-semantic</strong>, −spatial, −temporal, −content, −human-calibration, −unique-user, single-task.</div>
     </section>
 
     <section class="slide" data-section="Ethics">
@@ -734,6 +791,10 @@
         <li id="ref-10">Prinsloo, P., Slade, S., & Khalil, M. (2023). Multimodal learning analytics: In-between privacy and encroachment. <em>British Journal of Educational Technology</em>. <a href="https://doi.org/10.1111/bjet.13373">doi:10.1111/bjet.13373</a></li>
         <li id="ref-11">Disparities in students' propensity to consent to learning analytics. (2022). <em>International Journal of Artificial Intelligence in Education</em>. <a href="https://doi.org/10.1007/s40593-021-00254-2">doi:10.1007/s40593-021-00254-2</a></li>
         <li id="ref-12">Alwahaby, H., Cukurova, M., Papamitsiou, Z., & Giannakos, M. (2022). The evidence of impact and ethical considerations of multimodal learning analytics: A systematic literature review. <a href="https://discovery.ucl.ac.uk/id/eprint/10143076/">UCL Discovery</a></li>
+        <li id="ref-13">Kasneci, E. et al. (2023). ChatGPT for good? On opportunities and challenges of large language models for education. <em>Learning and Individual Differences, 103</em>, 102274. <a href="https://doi.org/10.1016/j.lindif.2023.102274">doi:10.1016/j.lindif.2023.102274</a></li>
+        <li id="ref-14">UNESCO. (2023). <em>Guidance for generative AI in education and research</em>. Paris: UNESCO. <a href="https://unesdoc.unesco.org/ark:/48223/pf0000386693">UNESDOC</a></li>
+        <li id="ref-15">Ji, Z. et al. (2023). Survey of hallucination in natural language generation. <em>ACM Computing Surveys, 55</em>(12), Article 248. <a href="https://doi.org/10.1145/3571730">doi:10.1145/3571730</a></li>
+        <li id="ref-16">Carlini, N. et al. (2021). Extracting training data from large language models. <em>30th USENIX Security Symposium</em>, 2633–2650. <a href="https://www.usenix.org/conference/usenixsecurity21/presentation/carlini-extracting">USENIX</a></li>
       </ol>
       <div class="block amber" style="margin-top:3%">
         <strong>Research dossier nội bộ:</strong> vision/status, literature & hypotheses, methodology, data/ethics, evaluation protocol, roadmap, paper blueprint và claim–evidence registry trong <code>research_docs/</code>.
@@ -765,6 +826,17 @@
           current = index;
           toggleOverview(false);
         }
+      });
+    });
+
+    document.querySelectorAll('a[href^="#ref-"]').forEach(anchor => {
+      anchor.addEventListener('click', event => {
+        const target = document.querySelector(anchor.getAttribute('href'));
+        const targetSlide = target && target.closest('.slide');
+        if (!targetSlide) return;
+        event.preventDefault();
+        current = slides.indexOf(targetSlide);
+        toggleOverview(false);
       });
     });
 
